@@ -1,24 +1,47 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt-nodejs')
 
-// User Schema
-var userSchema = mongoose.Schema({
-    username: { type: String, required: true ,unique: true,},
-    email: {
-        type: String, required: true,unique: true, validate: {
-            validator: validator.isEmail,
-            message: '{VALUE} is not a valid email'
-        }
+/**
+* User Schema
+*/
+const userSchema = new mongoose.Schema({
+    Name: {
+        type: String,
+        required: true
     },
-    password: { type: String },
-    role: { type: String },
-    address: { type: String },
-    phone: { type: Number },
-}, { timestamps: true },
+    Contact: {
+        type: String,
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    address: { 
+        type: String 
+    },
+    role: {
+        type: String,
+        required: true,
+        default: 'User'
+    },
+    created_at: {
+        type: Date,
+        required: true
+    },
+    
+},
+{ timestamps: true },
 {
     collection: 'userInfo'
-  }
-);
+},
+)
+
+
 // User Schema
 const userAudit = mongoose.Schema({
     username1: { type: String, required: true },
@@ -33,33 +56,12 @@ const userAudit = mongoose.Schema({
     Imageurl: { type: String },
 }, { timestamps: true });
 
-// Product Schema
-const productSchema = mongoose.Schema({
-    product: { type: String, required: true },
-    price: { type: Number, required: true },
-    description: { type: String },
-    category: { type: String },
-    Imagelink: { type: String }
-}, { timestamps: true });
 
-// Order Schema
-const orderSchema = mongoose.Schema({
-    username: { type: String, required: true },
-    price: { type: Number, required: true },
-    description: { type: String },
-    category: { type: String },
-    Imagelink: { type: String }
-}, { timestamps: true }
-);
 // Export the models
 const User = mongoose.model('User', userSchema);
-const Product = mongoose.model('Product', productSchema);
 const UserAudit = mongoose.model('UserAudit', userAudit);
-const OrderSchema = mongoose.model('OrderSchema', orderSchema);
 
 module.exports = {
     User,
-    Product,
     UserAudit,
-    OrderSchema
 };
