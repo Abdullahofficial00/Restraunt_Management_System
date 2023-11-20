@@ -1,594 +1,749 @@
+//import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'index.dart' as tester;
+import 'package:food/home.dart';
+import 'package:food/index.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+//import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:convert';
+import 'dart:io';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+// import 'package:flutter/foundation.dart'
+//     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-// double ffem = 1.0; // Adjust as needed
-// double fem = 1.0; // Adjust as needed
+void main() {
+  runApp(MyHomePage1());
+}
 
-void main() => runApp(MaterialApp(title: "Moody Foody",debugShowCheckedModeBanner: false, home: tester.Home()));
+class MyHomePage1 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
 
-// class home extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  int _currentIndex = 0;
+  
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: Container(
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 2,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Icon(
+                  Icons.search_rounded,
+                  color: Color.fromARGB(0, 0, 0, 0),
+                ),
+              ),
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search',
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          // IconButton(
+          //   icon: Icon(Icons.menu),
+          //   onPressed: () {
+          //     // Handle menu action
+          //   },
+          // ),
+        ],
+        backgroundColor: Color.fromARGB(255, 174, 52, 52).withOpacity(0.5),
+      ),
+      drawer: Drawer(
+        child: Stack(
+          children: [
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () {
+                  _currentIndex = 3; // Navigate to the first tab
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+            ),
+            Column(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.all(8.0), // Adjust the padding as needed
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white
+                        .withOpacity(0.5), // Adjust the opacity as needed
+                    child: Icon(
+                      Icons.person,
+                      size: 40, // Adjust the size of the icon as needed
+                      color: Colors.black, // Set the color of the icon
+                    ),
+                    radius: 50, // Adjust the radius as needed
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'M Abdullah', // Replace with the actual name
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 71, 71, 71),
+                    fontSize: 24,
+                  ),
+                ),
+                //currentIndex
+                Padding(
+                  padding:
+                      EdgeInsets.all(8.0), // Add padding to the entire ListTile
+                  child: ListTile(
+                    title: Text('Profile'),
+                    tileColor: Color.fromARGB(
+                        255, 71, 71, 71), // Set the background color
+
+                    onTap: () {
+                      int index = 3; 
+                      _currentIndex = index;
+                      _pageController.animateToPage(
+                        index,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                      Navigator.pop(context); // Close the drawer
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      EdgeInsets.all(8.0),
+                  child: ListTile(
+                    title: Text('About Us'),
+                    tileColor: Color.fromARGB(
+                        255, 71, 71, 71), 
+                    onTap: () {
+                      int index =4; 
+                      _currentIndex =index; 
+                      _pageController.animateToPage(
+                        index,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                      Navigator.pop(context); // Close the drawer
+                    },
+                  ),
+                ),
+                Padding(
+                  padding:
+                      EdgeInsets.all(8.0), // Add padding to the entire ListTile
+                  child: ListTile(
+                    title: Text('Contact Us'),
+                    tileColor: Color.fromARGB(
+                        255, 71, 71, 71), // Set the background color
+                    onTap: () {
+                      int index =
+                          5; // Assuming you want to navigate to the tab with index 3
+                      _currentIndex =
+                          index; // Assuming _currentIndex is a variable in your class
+                      _pageController.animateToPage(
+                        index,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                      Navigator.pop(context); // Close the drawer
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        backgroundColor: Color.fromARGB(100, 255, 255, 255),
+      ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentPage = index;
+          });
+        },
+        children: [
+          Home(),
+          FavoritesTab(),
+          CartTab(),
+          ProfileTab(),
+          AboutTab(),
+          ContactTab(),
+          // Add more pages as needed
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        showSelectedLabels: false, // Hide selected labels
+        showUnselectedLabels: true, // Hide unselected labels
+        //currentIndex: _selectedTabIndex,
+        currentIndex: _currentPage,
+        onTap: (index) {
+          _pageController.animateToPage(
+            index,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }, //_onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home,
+              color: Colors.red, // Set icon color to red
+            ),
+            label: 'Home',
+            backgroundColor: Colors.yellow, // Set background color to yellow
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.favorite,
+              color: Colors.red, // Set icon color to red
+            ),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.shopping_cart,
+              color: Colors.red, // Set icon color to red
+            ),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person,
+              color: Colors.red, // Set icon color to red
+            ),
+            label: 'Profile',
+            backgroundColor: Colors.yellow, // Set background color to yellow
+          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.visibility_off), // Icon for the hidden item
+          //   label: 'Hidden',
+          //   backgroundColor: Colors.transparent,
+          // ),
+        ],
+      ),
+    );
+  }
+}
+
+//============================TABS==================
+class CommonPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Common Page'),
+      ),
+      body: Center(
+        child: Text('Common Page Content'),
+      ),
+    );
+  }
+}
+
+class HomeTab extends State {
+  double screenWidth = 0;
+  double screenHeight = 0;
+  double MoodySize = 0;
+  double FoodySize = 0;
+  double WelcomeSize = 0;
+  
+  @override
+  Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+    MoodySize = screenWidth * 0.08;
+    FoodySize = screenWidth * 0.05;
+    WelcomeSize = screenWidth * 0.025;
+    return Center(
+      child: Column(children: <Widget>[
+        //logo FOODY MOODY
+        Center(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: '\n', style: TextStyle(height: 2.0)),
+                TextSpan(
+                  text: '   M',
+                  style: TextStyle(
+                    fontSize: FoodySize,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(219, 35, 38, 1.0),
+                  ),
+                ),
+                TextSpan(
+                  text: 'OO',
+                  style: TextStyle(
+                    fontSize: FoodySize,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(244, 194, 13, 1.0),
+                  ),
+                ),
+                TextSpan(
+                  text: 'DY',
+                  style: TextStyle(
+                    fontSize: FoodySize,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(219, 35, 38, 1.0),
+                  ),
+                ),
+                TextSpan(text: '\n', style: TextStyle(height: 2.0)),
+                TextSpan(
+                  text: 'F',
+                  style: TextStyle(
+                    fontSize: MoodySize,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(244, 194, 13, 1.0),
+                  ),
+                ),
+                TextSpan(
+                  text: 'OO',
+                  style: TextStyle(
+                    fontSize: MoodySize,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(219, 35, 38, 1.0),
+                  ),
+                ),
+                TextSpan(
+                  text: 'DY',
+                  style: TextStyle(
+                    fontSize: MoodySize,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(244, 194, 13, 1.0),
+                  ),
+                ),
+              ],
+            ),
+            textAlign: TextAlign.start,
+          ),
+        ),
+        //deals
+        Center(
+          child: Container(
+            child: PostContainer(),
+          ),
+        ),
+        //Products
+        Center(),
+      ]),
+    );
+  }
+}
+
+class FavoritesTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('Favorites Tab Content'),
+    );
+  }
+}
+
+class CartTab extends StatelessWidget{
+  @override
+   Widget build(BuildContext context) {
+     return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            //_image != null ? Image.file(_image!) : Text('No Image Selected'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: (){},
+              child: Text('Pick Image'),
+            ),
+          ],
+        ),
+     );
+   }
+}
+// class CartTab extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         body: SafeArea(
-//           child: Container(
-//             child: Stack(
-//               children: [
-//                 // ... Add the rest of the code from your snippet ...
-//                 Container(
-//                 //   child: Stack(
-//                 //     children: [
-//                 //       //BOX for Data----------------------------------------------------
-
-//                 //       // Positioned(
-//                 //       //   left: 43 * fem,
-//                 //       //   top: 271 * fem,
-//                 //       //   child: Container(
-//                 //       //     padding: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 0 * fem),
-//                 //       //     width: 332 * fem,
-//                 //       //     height: 245 * fem,
-//                 //       //     decoration: BoxDecoration(
-//                 //       //       boxShadow: [
-//                 //       //         BoxShadow(
-//                 //       //           color: Color(0x3fa01212),
-//                 //       //           offset: Offset(2 * fem, 3 * fem),
-//                 //       //           blurRadius: 2.5 * fem,
-//                 //       //         ),
-//                 //       //       ],
-//                 //       //     ),
-//                 //       //     child: Column(
-//                 //       //       crossAxisAlignment: CrossAxisAlignment.start,
-//                 //       //       children: [
-//                 //       //         Container(
-//                 //       //           margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 18.35 * fem),
-//                 //       //           padding: EdgeInsets.fromLTRB(11.97 * fem, 11.89 * fem, 11.97 * fem, 11.89 * fem),
-//                 //       //           width: 268.87 * fem,
-//                 //       //           decoration: BoxDecoration(
-//                 //       //             color: Color(0xafe6dcdc),
-//                 //       //             borderRadius: BorderRadius.circular(7 * fem),
-//                 //       //           ),
-//                 //       //           child: Text(
-//                 //       //             'Username',
-//                 //       //             style: GoogleFonts.lato(
-//                 //       //               fontSize: 11 * ffem,
-//                 //       //               fontWeight: FontWeight.w800,
-//                 //       //               height: 1.2125 * ffem / fem,
-//                 //       //               color: Color(0x49000000),
-//                 //       //             ),
-//                 //       //           ),
-//                 //       //         ),
-//                 //       //         Container(
-//                 //       //           margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 0 * fem, 18.35 * fem),
-//                 //       //           padding: EdgeInsets.fromLTRB(11.97 * fem, 11.89 * fem, 11.97 * fem, 11.89 * fem),
-//                 //       //           width: 268.87 * fem,
-//                 //       //           decoration: BoxDecoration(
-//                 //       //             color: Color(0xafe6dcdc),
-//                 //       //             borderRadius: BorderRadius.circular(7 * fem),
-//                 //       //           ),
-//                 //       //           child: Text(
-//                 //       //             'Email',
-//                 //       //             style: GoogleFonts.lato(
-
-//                 //       //               fontSize: 11 * ffem,
-//                 //       //               fontWeight: FontWeight.w800,
-//                 //       //               height: 1.2125 * ffem / fem,
-//                 //       //               color: Color(0x49000000),
-//                 //       //             ),
-//                 //       //           ),
-//                 //       //         ),
-//                 //       //         Opacity(
-//                 //       //           opacity: 0.69,
-//                 //       //           child: Container(
-//                 //       //             margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 63.13 * fem, 19.43 * fem),
-//                 //       //             padding: EdgeInsets.fromLTRB(11.97 * fem, 9.71 * fem, 7.62 * fem, 9.71 * fem),
-//                 //       //             width: double.infinity,
-//                 //       //             decoration: BoxDecoration(
-//                 //       //               color: Color(0xffe5dcdc),
-//                 //       //               borderRadius: BorderRadius.circular(7 * fem),
-//                 //       //             ),
-//                 //       //             child: Row(
-//                 //       //               crossAxisAlignment: CrossAxisAlignment.center,
-//                 //       //               children: [
-//                 //       //                 Container(
-//                 //       //                   margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 172.41 * fem, 0 * fem),
-//                 //       //                   child: Text(
-//                 //       //                     'Password',
-//                 //       //                     style: GoogleFonts.lato(
-
-//                 //       //                       fontSize: 11 * ffem,
-//                 //       //                       fontWeight: FontWeight.w800,
-//                 //       //                       height: 1.2125 * ffem / fem,
-//                 //       //                       color: Color(0x49000000),
-//                 //       //                     ),
-//                 //       //                   ),
-//                 //       //                 ),
-//                 //       //                 Container(
-//                 //       //                   width: 22.86 * fem,
-//                 //       //                   height: 18.35 * fem,
-
-//                 //       //                   child: Image(
-//                 //       //                     image: AssetImage('/images/1.png'), // Provide the asset path
-//                 //       //                     width: 22.86 * fem,
-//                 //       //                     height: 18.35 * fem,
-//                 //       //                   ),
-//                 //       //                 ),
-//                 //       //               ],
-//                 //       //             ),
-//                 //       //           ),
-//                 //       //         ),
-//                 //       //         Container(
-//                 //       //           margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 63.13 * fem, 21.59 * fem),
-//                 //       //           padding: EdgeInsets.fromLTRB(11.97 * fem, 9.71 * fem, 7.62 * fem, 9.71 * fem),
-//                 //       //           width: double.infinity,
-//                 //       //           decoration: BoxDecoration(
-//                 //       //             color: Color(0xafe6dcdc),
-//                 //       //             borderRadius: BorderRadius.circular(7 * fem),
-//                 //       //           ),
-//                 //       //           child: Row(
-//                 //       //             crossAxisAlignment: CrossAxisAlignment.center,
-//                 //       //             children: [
-//                 //       //               Container(
-//                 //       //                 margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 125.41 * fem, 0 * fem),
-//                 //       //                 child: Text(
-//                 //       //                   'Confirm Password',
-//                 //       //                   style: GoogleFonts.lato(
-
-//                 //       //                     fontSize: 11 * ffem,
-//                 //       //                     fontWeight: FontWeight.w800,
-//                 //       //                     height: 1.2125 * ffem / fem,
-//                 //       //                     color: Color(0x49000000),
-//                 //       //                   ),
-//                 //       //                 ),
-//                 //       //               ),
-//                 //       //               Container(
-//                 //       //                 width: 22.86 * fem,
-//                 //       //                 height: 18.35 * fem,
-//                 //       //                 // child: Image.network(
-//                 //       //                 //   '[Image url]',
-//                 //       //                 //   width: 22.86 * fem,
-//                 //       //                 //   height: 18.35 * fem,
-//                 //       //                 // ),
-//                 //       //               ),
-//                 //       //             ],
-//                 //       //           ),
-//                 //       //         ),
-//                 //       //         Container(
-//                 //       //           margin: EdgeInsets.fromLTRB(0 * fem, 0 * fem, 154.67 * fem, 0 * fem),
-//                 //       //           width: double.infinity,
-//                 //       //           child: Row(
-//                 //       //             crossAxisAlignment: CrossAxisAlignment.start,
-//                 //       //             children: [
-//                 //       //               Container(
-//                 //       //                 width: 16.33 * fem,
-//                 //       //                 height: 16.19 * fem,
-//                 //       //                 // child: Image.network(
-//                 //       //                 //   '[Image url]',
-//                 //       //                 //   width: 16.33 * fem,
-//                 //       //                 //   height: 16.19 * fem,
-//                 //       //                 // ),
-//                 //       //               ),
-//                 //       //               Container(
-//                 //       //                 margin: EdgeInsets.fromLTRB(0 * fem, 0.03 * fem, 0 * fem, 0 * fem),
-//                 //       //                 child: Text(
-//                 //       //                   'Agree with privacy and policy',
-//                 //       //                   style: GoogleFonts.lato(
-
-//                 //       //                     fontSize: 11 * ffem,
-//                 //       //                     fontWeight: FontWeight.w800,
-//                 //       //                     height: 1.2125 * ffem / fem,
-//                 //       //                     color: Color(0xff3c3c3c),
-//                 //       //                   ),
-//                 //       //                 ),
-//                 //       //               ),
-//                 //       //             ],
-//                 //       //           ),
-//                 //       //         ),
-//                 //       //       ],
-//                 //       //     ),
-//                 //       //   ),
-//                 //       // ),
-//                 //       Positioned(
-//                 //         // left: 0 * fem,
-//                 //         // top: 18 * fem,
-//                 //         child: Container(
-//                 //           width: 672 * fem,
-//                 //           height: 725 * fem,
-//                 //           child: Stack(
-//                 //             children: [
-//                 //               Positioned(
-//                 //                 // left: 211 * fem,
-//                 //                 // top: 332 * fem,
-//                 //                 child: Align(
-//                 //                     // child: SizedBox(
-//                 //                     //   width: 238 * fem,
-//                 //                     //   height: 212 * fem,
-//                 //                     //   child: Image.network(
-//                 //                     //     '[Image url]',
-//                 //                     //     fit: BoxFit.cover,
-//                 //                     //   ),
-//                 //                     // ),
-//                 //                     ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 0 ,
-//                 //                 // top: 0,
-//                 //                 child: Align(
-//                 //                   child: SizedBox(
-//                 //                     width: 500 * fem,
-//                 //                     height: 500 * fem,
-//                 //                     child: Image(
-//                 //                       image: AssetImage('/images/1.png'),
-//                 //                       height: 32,
-//                 //                       width: 32,
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 0 * fem,
-//                 //                 // top: 479 * fem,
-//                 //                 child: Align(
-//                 //                   child: SizedBox(
-//                 //                     width: 245 * fem,
-//                 //                     height: 246 * fem,
-//                 //                     child: Image(
-//                 //                       image: AssetImage('/images/3.png'),
-//                 //                       height: 32,
-//                 //                       width: 32,
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 114 * fem,
-//                 //                 // top: 521 * fem,
-//                 //                 child: Center(
-//                 //                   child: Align(
-//                 //                     child: SizedBox(
-//                 //                       width: 132 * fem,
-//                 //                       height: 14 * fem,
-//                 //                       child: RichText(
-//                 //                         textAlign: TextAlign.center,
-//                 //                         text: TextSpan(
-//                 //                           style: GoogleFonts.lato(
-//                 //                             fontSize: 11 * ffem,
-//                 //                             fontWeight: FontWeight.w800,
-//                 //                             height: 1.2125 * ffem / fem,
-//                 //                             color: Color(0xffe8e6e6),
-//                 //                           ),
-//                 //                           children: [
-//                 //                             TextSpan(
-//                 //                               text: 'Enter via',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xff3c3c3c),
-//                 //                               ),
-//                 //                             ),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text: 'Social Networks',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xfff4c20d),
-//                 //                               ),
-//                 //                             ),
-//                 //                           ],
-//                 //                         ),
-//                 //                       ),
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 83.5 * fem,
-//                 //                 // top: 702 * fem,
-//                 //                 child: Center(
-//                 //                   child: Align(
-//                 //                     child: SizedBox(
-//                 //                       width: 198 * fem,
-//                 //                       height: 14 * fem,
-//                 //                       child: TextButton(
-//                 //                         onPressed: () {},
-//                 //                         style: TextButton.styleFrom(
-//                 //                           padding: EdgeInsets.zero,
-//                 //                         ),
-//                 //                         child: RichText(
-//                 //                           textAlign: TextAlign.center,
-//                 //                           text: TextSpan(
-//                 //                             style: GoogleFonts.lato(
-//                 //                               fontSize: 11 * ffem,
-//                 //                               fontWeight: FontWeight.w800,
-//                 //                               height: 1.2125 * ffem / fem,
-//                 //                               color: Color(0xff3c3c3c),
-//                 //                             ),
-//                 //                             children: [
-//                 //                               TextSpan(
-//                 //                                   text:
-//                 //                                       'You already have an Account? '),
-//                 //                               TextSpan(
-//                 //                                 text: 'Log In',
-//                 //                                 style: GoogleFonts.lato(
-//                 //                                   fontSize: 11 * ffem,
-//                 //                                   fontWeight: FontWeight.w800,
-//                 //                                   height: 1.2125 * ffem / fem,
-//                 //                                   color: Color(0xfff4c20d),
-//                 //                                 ),
-//                 //                               ),
-//                 //                             ],
-//                 //                           ),
-//                 //                         ),
-//                 //                       ),
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 132 * fem,
-//                 //                 // top: 604 * fem,
-//                 //                 child: Center(
-//                 //                   child: Align(
-//                 //                     child: SizedBox(
-//                 //                       width: 95 * fem,
-//                 //                       height: 14 * fem,
-//                 //                       child: RichText(
-//                 //                         textAlign: TextAlign.center,
-//                 //                         text: TextSpan(
-//                 //                           style: GoogleFonts.lato(
-//                 //                             fontSize: 11 * ffem,
-//                 //                             fontWeight: FontWeight.w800,
-//                 //                             height: 1.2125 * ffem / fem,
-//                 //                             color: Color(0xffe8e6e6),
-//                 //                           ),
-//                 //                           children: [
-//                 //                             TextSpan(text: 'Or'),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text: 'login',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xffdb2326),
-//                 //                               ),
-//                 //                             ),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text: 'with',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xff3c3c3c),
-//                 //                               ),
-//                 //                             ),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text: 'email',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xffdb2326),
-//                 //                               ),
-//                 //                             ),
-//                 //                           ],
-//                 //                         ),
-//                 //                       ),
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 51 * fem,
-//                 //                 // top: 223 * fem,
-//                 //                 child: Center(
-//                 //                   child: Align(
-//                 //                     child: SizedBox(
-//                 //                       width: 258 * fem,
-//                 //                       height: 14 * fem,
-//                 //                       child: RichText(
-//                 //                         textAlign: TextAlign.center,
-//                 //                         text: TextSpan(
-//                 //                           style: GoogleFonts.lato(
-//                 //                             fontSize: 11 * ffem,
-//                 //                             fontWeight: FontWeight.w800,
-//                 //                             height: 1.2125 * ffem / fem,
-//                 //                             color: Color(0xffe8e6e6),
-//                 //                           ),
-//                 //                           children: [
-//                 //                             TextSpan(text: 'Please'),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text: 'Login',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xfff4c20d),
-//                 //                               ),
-//                 //                             ),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(text: 'or'),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text: 'Sign up',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xffdb2326),
-//                 //                               ),
-//                 //                             ),
-//                 //                             TextSpan(text: ' '),
-//                 //                             TextSpan(
-//                 //                               text:
-//                 //                                   'to continue using our app.',
-//                 //                               style: GoogleFonts.lato(
-//                 //                                 fontSize: 11 * ffem,
-//                 //                                 fontWeight: FontWeight.w800,
-//                 //                                 height: 1.2125 * ffem / fem,
-//                 //                                 color: Color(0xff3c3c3c),
-//                 //                               ),
-//                 //                             ),
-//                 //                           ],
-//                 //                         ),
-//                 //                       ),
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //               Positioned(
-//                 //                 // left: 100 * fem,
-//                 //                 // top: 52 * fem,
-//                 //                 child: Center(
-//                 //                   child: Align(
-//                 //                     child: SizedBox(
-//                 //                       width: 167 * fem,
-//                 //                       height: 50 * fem,
-//                 //                       child: Center(
-//                 //                         child: RichText(
-//                 //                           text: TextSpan(
-//                 //                             children: [
-//                 //                               TextSpan(
-//                 //                                   text: 'Welcome to',
-//                 //                                   style: TextStyle(
-//                 //                                     fontSize: 22 * ffem,
-//                 //                                     fontWeight: FontWeight.w800,
-//                 //                                     height: 1.2272727272727273 *
-//                 //                                         ffem /
-//                 //                                         fem,
-//                 //                                     color: Color(0xff000000),
-//                 //                                   )),
-
-//                 //                               TextSpan(
-//                 //                                   text: '\n',
-//                 //                                   style:
-//                 //                                       TextStyle(height: 2.0)),
-//                 //                               TextSpan(
-//                 //                                   text: '  M',
-//                 //                                   style: TextStyle(
-//                 //                                       fontSize: 13,
-//                 //                                       fontFamily: 'Inter',
-//                 //                                       fontWeight:
-//                 //                                           FontWeight.bold,
-//                 //                                       color: Color.fromRGBO(
-//                 //                                           219, 35, 38, 1.0))),
-//                 //                               TextSpan(
-//                 //                                   text: 'OO',
-//                 //                                   style: TextStyle(
-//                 //                                       fontSize: 13,
-//                 //                                       fontFamily: 'Inter',
-//                 //                                       fontWeight:
-//                 //                                           FontWeight.bold,
-//                 //                                       color: Color.fromRGBO(
-//                 //                                           244, 194, 13, 1.0))),
-//                 //                               TextSpan(
-//                 //                                   text: 'DY',
-//                 //                                   style: TextStyle(
-//                 //                                       fontSize: 13,
-//                 //                                       fontFamily: 'Inter',
-//                 //                                       fontWeight:
-//                 //                                           FontWeight.bold,
-//                 //                                       color: Color.fromRGBO(
-//                 //                                           219, 35, 38, 1.0))),
-//                 //                               TextSpan(
-//                 //                                   text: '\n',
-//                 //                                   style:
-//                 //                                       TextStyle(height: 2.0)),
-//                 //                               //TextSpan(text: ' ', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold,color: Colors.black)),
-//                 //                               TextSpan(
-//                 //                                   text: 'F',
-//                 //                                   style: TextStyle(
-//                 //                                       fontSize: 18,
-//                 //                                       fontFamily: 'Inter',
-//                 //                                       fontWeight:
-//                 //                                           FontWeight.bold,
-//                 //                                       color: Color.fromRGBO(
-//                 //                                           244, 194, 13, 1.0))),
-//                 //                               TextSpan(
-//                 //                                   text: 'OO',
-//                 //                                   style: TextStyle(
-//                 //                                       fontSize: 18,
-//                 //                                       fontFamily: 'Inter',
-//                 //                                       fontWeight:
-//                 //                                           FontWeight.bold,
-//                 //                                       color: Color.fromRGBO(
-//                 //                                           219, 35, 38, 1.0))),
-//                 //                               TextSpan(
-//                 //                                   text: 'DY',
-//                 //                                   style: TextStyle(
-//                 //                                       fontSize: 18,
-//                 //                                       fontFamily: 'Inter',
-//                 //                                       fontWeight:
-//                 //                                           FontWeight.bold,
-//                 //                                       color: Color.fromRGBO(
-//                 //                                           244, 194, 13, 1.0))),
-//                 //                             ],
-//                 //                           ),
-//                 //                           textAlign: TextAlign.start,
-//                 //                         ),
-//                 //                       ),
-//                 //                     ),
-//                 //                   ),
-//                 //                 ),
-//                 //               ),
-//                 //             ],
-//                 //           ),
-//                 //         ),
-//                 //       ),
-//                 //       //------------------------------Yellow Arrow Botton--------------
-//                 //       // Positioned(
-//                 //       //   left: 312 * fem,
-//                 //       //   top: 319 * fem,
-//                 //       //   child: Center(
-//                 //       //     child: SizedBox(
-//                 //       //       width: 50 * fem,
-//                 //       //       height: 50 * fem,
-//                 //       //       child: FloatingActionButton(
-//                 //       //         onPressed: () {},
-//                 //       //         backgroundColor: Color(0xfff4c20d),
-//                 //       //         child: Icon(
-//                 //       //           Icons.arrow_forward,
-//                 //       //           color: Color.fromARGB(255, 0, 0, 0),
-//                 //       //           size: 32 * fem,
-//                 //       //         ),
-//                 //       //       ),
-//                 //       //     ),
-//                 //       //   ),
-//                 //       // ),
-//                 //     ],
-//                 //   ),
-//                 ),
-
-//                 // Positioned(
-//                 //   left: 312,
-//                 //   top: 319,
-//                 //   child: Center(
-//                 //     child: SizedBox(
-//                 //       width: 50,
-//                 //       height: 50,
-//                 //       child: FloatingActionButton(
-//                 //         onPressed: () {},
-//                 //         backgroundColor: Color(0xfff4c20d),
-//                 //         child: Icon(
-//                 //           Icons.arrow_forward,
-//                 //           color: Color(0xff000000),
-//                 //           size: 32,
-//                 //         ),
-//                 //       ),
-//                 //     ),
-//                 //   ),
-//                 // ),
-//               ],
+//     return Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: <Widget>[
+//             //_image != null ? Image.file(_image!) : Text('No Image Selected'),
+//             SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: (){},
+//               child: Text('Pick Image'),
 //             ),
-//           ),
+//             SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () async{ImagePicker imagePicker = ImagePicker();
+//                     XFile? file = 
+//                         await imagePicker.pickImage(source: ImageSource.camera);print(file?.path); 
+//                         if (file == null) return;
+//                     //Import dart:core
+//                     String uniqueFileName =
+//                         DateTime.now().millisecondsSinceEpoch.toString();
+
+//                     /*Step 2: Upload to Firebase storage*/
+//                     //Install firebase_storage
+//                     //Import the library
+
+//                     //Get a reference to storage root
+//                     Reference referenceRoot = FirebaseStorage.instance.ref();
+//                     Reference referenceDirImages =
+//                         referenceRoot.child('images');
+
+//                     //Create a reference for the image to be stored
+//                     Reference referenceImageToUpload =
+//                         referenceDirImages.child('uniqueFileName');
+
+//                     //Handle errors/success
+//                     try {
+//                       //Store the file
+//                       await referenceImageToUpload.putFile(File(file!.path));
+//                       //Success: get the download URL
+//                       var imageUrl = await referenceImageToUpload.getDownloadURL();
+//                     } catch (error) {
+//                       //Some error occurred
+//                     }
+//                   },
+//               child: Text('Upload Image to Firebase'),
+//             ),
+            
+//           ],
 //         ),
-//       ),
-//     );
+//       );
 //   }
 // }
+
+class ProfileTab extends StatelessWidget {
+  double screenWidth = 0;
+  double screenHeight = 0;
+  double MoodySize = 0;
+  double FoodySize = 0;
+  double WelcomeSize = 0;
+  @override
+  Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+    MoodySize = screenWidth * 0.08;
+    FoodySize = screenWidth * 0.05;
+    WelcomeSize = screenWidth * 0.025;
+    return Center(
+      child: Column(
+        children: <Widget>[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Logo
+                  //Welcome to Moody Foody
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(text: '\n', style: TextStyle(height: 2.0)),
+                          TextSpan(
+                            text: '   M',
+                            style: TextStyle(
+                              fontSize: FoodySize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(219, 35, 38, 1.0),
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'OO',
+                            style: TextStyle(
+                              fontSize: FoodySize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(244, 194, 13, 1.0),
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'DY',
+                            style: TextStyle(
+                              fontSize: FoodySize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(219, 35, 38, 1.0),
+                            ),
+                          ),
+                          TextSpan(text: '\n', style: TextStyle(height: 2.0)),
+                          TextSpan(
+                            text: 'F',
+                            style: TextStyle(
+                              fontSize: MoodySize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(244, 194, 13, 1.0),
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'OO',
+                            style: TextStyle(
+                              fontSize: MoodySize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(219, 35, 38, 1.0),
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'DY',
+                            style: TextStyle(
+                              fontSize: MoodySize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(244, 194, 13, 1.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+
+                  // User Icon
+                  Center(
+                    child: CircleAvatar(
+                      radius: 60.0,
+                      child: Icon(
+                        Icons.person,
+                        size: 40, // Adjust the size of the icon as needed
+                        color: Colors.black, // Set the color of the icon
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    width: screenWidth * 1 - 150,
+                    height: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 2.0, right: 2.0, top: 2.0, bottom: 0.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Name',
+                            style: TextStyle(
+                              fontSize: WelcomeSize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(64, 64, 63, 1),
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 20.0),
+
+                  // Name Editable Box
+                  EditableProfileField(
+                    label: 'Name',
+                    Value: 'John Doe', // Replace with actual API value
+                  ),
+
+                  Container(
+                    width: screenWidth * 1 - 150,
+                    height: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 2.0, right: 2.0, top: 2.0, bottom: 0.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Address',
+                            style: TextStyle(
+                              fontSize: WelcomeSize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(64, 64, 63, 1),
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+
+                  // Address Editable Box
+                  EditableProfileField(
+                    label: 'Address',
+                    Value:
+                        '123 Main Street, City', // Replace with actual API value
+                  ),
+
+                  Container(
+                    width: screenWidth * 1 - 150,
+                    height: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 2.0, right: 2.0, top: 2.0, bottom: 0.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Phone',
+                            style: TextStyle(
+                              fontSize: WelcomeSize,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(64, 64, 63, 1),
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+
+                  // Phone Editable Box
+                  EditableProfileField(
+                    label: 'Phone',
+                    Value: '(123) 456-7890', // Replace with actual API value
+                  ),
+                  SizedBox(height: 20.0),
+
+                  // Save Button
+                  ElevatedButton(
+                    onPressed: () {
+                      // Implement save functionality
+                    },
+                    child: Text('Save'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AboutTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('About Tab Content'),
+    );
+  }
+}
+
+class ContactTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text('Contact Tab Content'),
+    );
+  }
+}
+
+class EditableProfileField extends StatelessWidget {
+  final String label;
+  final String Value;
+  String initialValue = '';
+
+  EditableProfileField({
+    required this.label,
+    required this.Value,
+  });
+
+  double screenWidth = 0;
+  double screenHeight = 0;
+  double MoodySize = 0;
+  double FoodySize = 0;
+  double WelcomeSize = 0;
+  @override
+  Widget build(BuildContext context) {
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+    MoodySize = screenWidth * 0.08;
+    FoodySize = screenWidth * 0.05;
+    WelcomeSize = screenWidth * 0.025;
+    return Container(
+      width: screenWidth * 1 - 150,
+      height: 40,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(128, 194, 194, 194),
+        borderRadius: BorderRadius.circular(7),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x3fa01212),
+            offset: Offset(1, 1),
+            blurRadius: 2.5,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(2),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: TextEditingController(text: Value),
+                decoration: InputDecoration(
+                  hintText: 'Enter your $label',
+                  hintStyle: TextStyle(
+                    color: Color.fromARGB(255, 93, 93, 93),
+                    fontSize: 16.0,
+                    fontFamily: 'Inter',
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(10.0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

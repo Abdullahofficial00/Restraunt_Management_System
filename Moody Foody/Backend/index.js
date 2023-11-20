@@ -2,6 +2,7 @@ const express=require('express');
 const bodyparser=require('body-parser');
 const userRouter=require('./routes/userrouts');
 const cors = require ('cors');
+const mongoose = require('mongoose');
 
 //const cors=require('cors');
 const app = express();
@@ -23,4 +24,5 @@ app.get('/',(req,res) => {
 
 app.listen(PORT,()=>{
     console.log("connected");
+    console.log('Mongoose version:', mongoose.version);
 })

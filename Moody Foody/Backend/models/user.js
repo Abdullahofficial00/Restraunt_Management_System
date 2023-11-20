@@ -1,15 +1,24 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 // User Schema
-const userSchema = mongoose.Schema({
-    username: { type: String, required: true },
-    email: { type: String, required: true },
+var userSchema = mongoose.Schema({
+    username: { type: String, required: true ,unique: true,},
+    email: {
+        type: String, required: true,unique: true, validate: {
+            validator: validator.isEmail,
+            message: '{VALUE} is not a valid email'
+        }
+    },
     password: { type: String },
     role: { type: String },
     address: { type: String },
     phone: { type: Number },
-    Imageurl: { type: String },
-}, { timestamps: true });
+}, { timestamps: true },
+{
+    collection: 'userInfo'
+  }
+);
 // User Schema
 const userAudit = mongoose.Schema({
     username1: { type: String, required: true },
@@ -26,11 +35,11 @@ const userAudit = mongoose.Schema({
 
 // Product Schema
 const productSchema = mongoose.Schema({
-    name: { type: String, required: true },
+    product: { type: String, required: true },
     price: { type: Number, required: true },
     description: { type: String },
     category: { type: String },
-    Imagelink:{ type: String }
+    Imagelink: { type: String }
 }, { timestamps: true });
 
 // Order Schema
@@ -39,13 +48,18 @@ const orderSchema = mongoose.Schema({
     price: { type: Number, required: true },
     description: { type: String },
     category: { type: String },
-    Imagelink:{ type: String }
-}, { timestamps: true });
+    Imagelink: { type: String }
+}, { timestamps: true }
+);
 // Export the models
 const User = mongoose.model('User', userSchema);
 const Product = mongoose.model('Product', productSchema);
+const UserAudit = mongoose.model('UserAudit', userAudit);
+const OrderSchema = mongoose.model('OrderSchema', orderSchema);
 
 module.exports = {
     User,
-    Product
+    Product,
+    UserAudit,
+    OrderSchema
 };

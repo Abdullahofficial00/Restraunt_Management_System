@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_social_button/flutter_social_button.dart';
@@ -5,8 +7,10 @@ import 'dart:convert';
 import 'signup.dart';
 import 'home.dart';
 import 'package:flutter/gestures.dart';
+import 'forgotpass.dart';
 
 void main() => runApp(Login());
+
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -14,9 +18,9 @@ class Login extends StatelessWidget {
       title: "Foody Moody",
       debugShowCheckedModeBanner: false,
       routes: {
-        '/home': (context) => Home(),
+        '/home': (context) => MyHomePage(),
         '/signup': (context) => SignUp(),
-
+        '/forgotpass': (context) => ForgotPasswordScreen(),
       },
       home: LoginPage(),
     );
@@ -25,10 +29,9 @@ class Login extends StatelessWidget {
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
-  
+
   @override
   _LoginPageState createState() => _LoginPageState();
-  
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -40,15 +43,16 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
   bool isChecked = false;
 
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  //TextEditingController _usernameController = TextEditingController();
+  //TextEditingController _passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   //========================================================================
   List<Map<String, String>> data = [];
   bool isLoading = true; // Initially, set to true for loading
-  
+
   @override
-  
   void initState() {
     super.initState();
     getData();
@@ -186,10 +190,58 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
   }
+
   //===============================================================================================
+  Future<bool> loginUser(BuildContext context) async {
+    try {
+      final response = await http.post(
+        Uri.parse("http://localhost:3000/api/login"),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "email": emailController.text,
+          "password": passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        // Login successful
+        return true;
+      } else if (response.statusCode == 401) {
+        // Invalid user or password
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Invalid user or password. Please try again."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      } else {
+        // Other errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Login failed. Please try again later."),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      }
+    } catch (e) {
+      // Handle network or other errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Error during login. Please check your internet connection."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+  }
 
   @override
-  
   Widget build(BuildContext context) {
     WelcomeSize = screenWidth * 0.025;
     screenWidth = MediaQuery.of(context).size.width;
@@ -354,7 +406,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ]))),
             ),
-            //Login Here
+            //Login Here Text
             Center(
               child: Container(
                   child: RichText(
@@ -411,8 +463,9 @@ class _LoginPageState extends State<LoginPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2),
                             child: TextField(
+                              controller: emailController,
                               decoration: InputDecoration(
-                                hintText: 'Username',
+                                hintText: 'Email',
                                 hintStyle: TextStyle(
                                   color: Color.fromARGB(255, 93, 93, 93),
                                   fontSize: WelcomeSize,
@@ -447,6 +500,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2),
                             child: TextField(
+                              controller: passwordController,
                               obscureText: _obscureText,
                               decoration: InputDecoration(
                                 hintText: 'Password',
@@ -479,8 +533,7 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
                           onTap: () {
-                            // Navigate to the route for password recovery (replace '' with your route name)
-                            Navigator.pushNamed(context, '/forgot_password');
+                            Navigator.pushNamed(context, '/forgotpass');
                           },
                           child: Text(
                             'Forgot Password?',
@@ -499,7 +552,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-             //Enter via Social Media
+            //Enter via Social Media
             Center(
               child: Container(
                 child: RichText(
@@ -553,50 +606,49 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
-            )
-            ),
+            )),
             //Or login with email
             Center(
               child: Container(
-                padding: EdgeInsets.all(10.0), // Add padding to the Container
+                  padding: EdgeInsets.all(10.0), // Add padding to the Container
                   child: RichText(
                       text: TextSpan(children: [
-                TextSpan(
-                  text: 'Or ',
-                  style: TextStyle(
-                    fontSize: WelcomeSize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                  ),
-                ),
-                TextSpan(
-                  text: 'Login ',
-                  style: TextStyle(
-                      fontSize: WelcomeSize,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(219, 35, 38, 1.0)),
-                ),
-                TextSpan(
-                  text: 'with ',
-                  style: TextStyle(
-                    fontSize: WelcomeSize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                  ),
-                ),
-                TextSpan(
-                  text: 'Email',
-                  style: TextStyle(
-                    fontSize: WelcomeSize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(219, 35, 38, 1.0),
-                  ),
-                ),
-              ]))),
+                    TextSpan(
+                      text: 'Or ',
+                      style: TextStyle(
+                        fontSize: WelcomeSize,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(0, 0, 0, 1),
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Login ',
+                      style: TextStyle(
+                          fontSize: WelcomeSize,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(219, 35, 38, 1.0)),
+                    ),
+                    TextSpan(
+                      text: 'with ',
+                      style: TextStyle(
+                        fontSize: WelcomeSize,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(0, 0, 0, 1),
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Email',
+                      style: TextStyle(
+                        fontSize: WelcomeSize,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(219, 35, 38, 1.0),
+                      ),
+                    ),
+                  ]))),
             ),
             //Log In Button
             Center(
@@ -610,10 +662,16 @@ class _LoginPageState extends State<LoginPage> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: TextButton(
-                  onPressed: () {
-                    // Handle the Sign Up button tap
-                    Navigator.pushNamed(context, '/home');
-                    print('Log in button tapped!');
+                  onPressed: () async {
+                    if (await loginUser(context)) {
+                      // Login successful
+                      Navigator.pushNamed(context, '/home');
+                      print('Log in button tapped!');
+                    } else {
+                      // Show error popup if login fails
+                      _showErrorPopup(
+                          context, 'Invalid input. Please check your data.');
+                    }
                   },
                   child: Text(
                     'Log In',
@@ -663,7 +721,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-          
           ],
         ),
       ),
@@ -677,6 +734,26 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  void _showErrorPopup(BuildContext context, String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(errorMessage),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void authenticateUser() {
     // Replace the following line with your actual authentication logic
     bool isAuthenticated = true;
@@ -684,7 +761,7 @@ class _LoginPageState extends State<LoginPage> {
     if (isAuthenticated) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Home()),
+        MaterialPageRoute(builder: (context) => MyHomePage()),
       );
       // } else {
       //   // Show error message or handle authentication failure

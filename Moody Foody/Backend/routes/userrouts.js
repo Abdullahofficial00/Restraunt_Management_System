@@ -6,7 +6,6 @@ const { validateToken, requireRoles } = require('../utils/authmiddleware');
 router.post('/admin', validateToken, userController.admindasbhard);
 
 router.post('/user',userController.createUser);
-router.post('/product',userController.createProduct);
 router.get('/user',userController.getAllUser);
 router.put('/user/:id',validateToken,userController.updateUser);
 router.delete('/user/:id',validateToken,userController.deleteUser);
@@ -14,6 +13,11 @@ router.post('/login/',userController.loginuser);
 router.get('/auth',validateToken,requireRoles(['admin','Student']),(req,res)=>{
     return res.status(201).json({msg:"Validation completed"});
 });
+
+router.post('/product',userController.createProduct);
+router.get('/product',userController.getAllProducts);
+
+router.post('/forgot/',userController.forgot);
 
 
 // if you want to insert the data into database we use post request
