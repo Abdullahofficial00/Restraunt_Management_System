@@ -1,8 +1,11 @@
 const express=require('express');
 const bodyparser=require('body-parser');
-const userRouter=require('./routes/userrouts');
+const userRouter=require('./routes/user.routes');
+const emailRouter=require('./routes/email.routes');
+const foodRouter=require('./routes/food.routes');
 const cors = require ('cors');
 const mongoose = require('mongoose');
+
 
 //const cors=require('cors');
 const app = express();
@@ -17,6 +20,8 @@ app.use(express.json());
 app.use(bodyparser.json());
 app.use(cors());
 app.use('/api', userRouter);
+app.use('/api', emailRouter);
+app.use('/api', foodRouter);
 
 app.get('/',(req,res) => {
     res.send('Hello World!');

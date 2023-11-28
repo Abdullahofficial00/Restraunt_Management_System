@@ -18,7 +18,7 @@ class Login extends StatelessWidget {
       title: "Foody Moody",
       debugShowCheckedModeBanner: false,
       routes: {
-        '/home': (context) => MyHomePage(),
+        '/home': (context) => MyHomePage2(),
         '/signup': (context) => SignUp(),
         '/forgotpass': (context) => ForgotPasswordScreen(),
       },
@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     getData();
   }
-
+//=========================login
   Future<void> getData() async {
     try {
       final response = await http.get(
@@ -76,15 +76,17 @@ class _LoginPageState extends State<LoginPage> {
         for (final item in jsonData) {
           final id = item["_id"];
           final email = item["email"];
+          final password = item["password"];
           final role = item["role"];
-
-          if (email != null || role != null) {
-            Map<String, String> userEntry = {
-              "_id": id,
-              "email": email ?? "",
-              "role": role ?? "",
-            };
-            userEntries.add(userEntry);
+          if (role != "") {
+            if (email != null || password != null) {
+              Map<String, String> userEntry = {
+                "_id": id,
+                "email": email ?? "",
+                "password": password ?? "",
+              };
+              userEntries.add(userEntry);
+            }
           }
         }
 
@@ -527,19 +529,17 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(
-                          8.0), // Adjust the padding as needed
+                      padding: const EdgeInsets.all(8.0),
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, '/forgotpass');
+                            //Navigator.pushNamed(context, '/forgotpass');
                           },
                           child: Text(
                             'Forgot Password?',
                             style: TextStyle(
-                              fontSize:
-                                  WelcomeSize, // Use your desired font size
+                              fontSize: WelcomeSize,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(0, 0, 0, 1),
@@ -761,7 +761,7 @@ class _LoginPageState extends State<LoginPage> {
     if (isAuthenticated) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
+        MaterialPageRoute(builder: (context) => MyHomePage2()),
       );
       // } else {
       //   // Show error message or handle authentication failure

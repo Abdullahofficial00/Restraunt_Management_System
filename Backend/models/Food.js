@@ -1,18 +1,11 @@
 const mongoose = require('mongoose')
 
-/**
-* Food Schema
-*/
 const FoodsSchema = new mongoose.Schema({
     Name: {
         type: String,
         required: true
     },
     Price: {
-        type: String,
-        required: true
-    },
-    Type: {
         type: String,
         required: true
     },
@@ -24,12 +17,10 @@ const FoodsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    created_at: {
-        type: Date,
-        required: true
-    },
-})
+},
+{ timestamps: true },
+)
 
-let Food = mongoose.model('Food', FoodsSchema, 'Foods')
+const Food = mongoose.model('Food', FoodsSchema);
 
 module.exports = Food

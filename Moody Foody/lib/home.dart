@@ -1,8 +1,36 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MyHomePage());
+}
+
+Future<XFile?> pickImage() async {
+  try {
+    // Open the image picker
+    final XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource
+          .gallery, // You can also use ImageSource.camera for camera access
+    );
+
+    return pickedFile;
+  } catch (e) {
+    // Handle any exceptions that might occur during image picking
+    print("Error picking image: $e");
+    return null;
+  }
+}
+
+class Food {
+  final int id;
+  final String name;
+
+  Food({required this.id, required this.name});
+
+  factory Food.fromJson(Map<String, dynamic> json) {
+    return Food(id: json['id'], name: json['Name']);
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -24,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage2> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   int _currentIndex = 0;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage2> {
                         255, 71, 71, 71), // Set the background color
 
                     onTap: () {
-                      int index = 3; 
+                      int index = 3;
                       _currentIndex = index;
                       _pageController.animateToPage(
                         index,
@@ -134,15 +162,13 @@ class _MyHomePageState extends State<MyHomePage2> {
                   ),
                 ),
                 Padding(
-                  padding:
-                      EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                   child: ListTile(
                     title: Text('About Us'),
-                    tileColor: Color.fromARGB(
-                        255, 71, 71, 71), 
+                    tileColor: Color.fromARGB(255, 71, 71, 71),
                     onTap: () {
-                      int index =4; 
-                      _currentIndex =index; 
+                      int index = 4;
+                      _currentIndex = index;
                       _pageController.animateToPage(
                         index,
                         duration: Duration(milliseconds: 500),
@@ -271,6 +297,7 @@ class HomeTab extends StatelessWidget {
   double MoodySize = 0;
   double FoodySize = 0;
   double WelcomeSize = 0;
+  
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
@@ -352,8 +379,32 @@ class HomeTab extends StatelessWidget {
             child: PostContainer(),
           ),
         ),
+        //Button for Upload
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () async {
+                  XFile? pickedFile = await pickImage();
+
+                  if (pickedFile != null) {
+                    // Do something with the picked image file
+                    print("Picked Image Path: ${pickedFile.path}");
+                  } else {
+                    // User canceled the image picking
+                    print("User canceled image picking");
+                  }
+                },
+                child: Text("Pick Image"),
+              ),
+            ],
+          ),
+        ),
         //Products
-        Center(),
+        Center(
+
+        ),
       ]),
     );
   }
@@ -372,7 +423,7 @@ class CartTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Cart Tab Content'),
+      child: Text('Favorites Tab Content'),
     );
   }
 }

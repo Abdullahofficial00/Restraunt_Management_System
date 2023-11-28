@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcrypt-nodejs')
+//const bcrypt = require('bcrypt-nodejs')
 
 /**
 * User Schema
 */
 const userSchema = new mongoose.Schema({
-    Name: {
+    username: {
         type: String,
         required: true
     },
-    Contact: {
+    phone: {
         type: String,
     },
     email: {
@@ -22,17 +22,13 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     address: { 
-        type: String 
+        type: String,
+        default: 'On-site'
     },
     role: {
         type: String,
-        required: true,
         default: 'User'
-    },
-    created_at: {
-        type: Date,
-        required: true
-    },
+    }
     
 },
 { timestamps: true },

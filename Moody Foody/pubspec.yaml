@@ -39,7 +39,7 @@ dependencies:
   flutter_social_button: any
   firebase_core: any
   firebase_storage: any
-  image_picker: any
+  image_picker: ^1.0.4
   cloud_firestore: ^4.13.2
 
 dev_dependencies:

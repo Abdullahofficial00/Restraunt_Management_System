@@ -58,8 +58,8 @@ class _HomeState extends State<SignUpPage> {
           'password': passwordController.text,
           'ConfirmPassword': confirmPasswordController.text,
           'role': "User",
-          'address': "",
-          'phone': "",
+          'address': "onsite",
+          'phone': "0",
         }),
       );
 
