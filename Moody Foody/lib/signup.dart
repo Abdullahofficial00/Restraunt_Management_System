@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_social_button/flutter_social_button.dart';
 import 'package:flutter/gestures.dart';
-import 'package:food/index.dart';
 import 'login.dart';
-//for api
 import 'dart:convert';
+import 'home.dart';
 import 'package:http/http.dart' as http;
 
 void main() => runApp(SignUp());

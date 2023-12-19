@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/rendering.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(MyHomePage());
-}
-
-Future<XFile?> pickImage() async {
-  try {
-    // Open the image picker
-    final XFile? pickedFile = await ImagePicker().pickImage(
-      source: ImageSource
-          .gallery, // You can also use ImageSource.camera for camera access
-    );
-
-    return pickedFile;
-  } catch (e) {
-    // Handle any exceptions that might occur during image picking
-    print("Error picking image: $e");
-    return null;
-  }
+  runApp(Home());
 }
 
 class Food {
@@ -33,25 +18,51 @@ class Food {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage2(),
+      home: Home2(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage2 extends StatefulWidget {
+class Home2 extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage2> {
+class _MyHomePageState extends State<Home2> {
+  String username = '';
+  int userId = 0;
   final PageController _pageController = PageController();
-  int _currentPage = 0;
   int _currentIndex = 0;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserInfo();
+  }
+
+  Future<void> getUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? '';
+      userId = prefs.getInt('userId') ?? 0;
+    });
+  }
+
+  void _navigateToFoodTab() {
+  int foodTabIndex = 6; // Replace with the index of the FoodTab in your PageView
+  _pageController.animateToPage(
+    foodTabIndex,
+    duration: Duration(milliseconds: 500),
+    curve: Curves.easeInOut,
+  );
+  Navigator.pop(context); // Close the drawer or any other open dialogs
+}
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage2> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'M Abdullah', // Replace with the actual name
+                  'Welcome, $username!', // Replace with the actual name
                   style: TextStyle(
                     color: const Color.fromARGB(255, 71, 71, 71),
                     fontSize: 24,
@@ -150,8 +161,7 @@ class _MyHomePageState extends State<MyHomePage2> {
                         255, 71, 71, 71), // Set the background color
 
                     onTap: () {
-                      int index = 3;
-                      _currentIndex = index;
+                      int index = 3; // Set the appropriate index
                       _pageController.animateToPage(
                         index,
                         duration: Duration(milliseconds: 500),
@@ -167,8 +177,7 @@ class _MyHomePageState extends State<MyHomePage2> {
                     title: Text('About Us'),
                     tileColor: Color.fromARGB(255, 71, 71, 71),
                     onTap: () {
-                      int index = 4;
-                      _currentIndex = index;
+                      int index = 4; // Set the appropriate index
                       _pageController.animateToPage(
                         index,
                         duration: Duration(milliseconds: 500),
@@ -186,10 +195,7 @@ class _MyHomePageState extends State<MyHomePage2> {
                     tileColor: Color.fromARGB(
                         255, 71, 71, 71), // Set the background color
                     onTap: () {
-                      int index =
-                          5; // Assuming you want to navigate to the tab with index 3
-                      _currentIndex =
-                          index; // Assuming _currentIndex is a variable in your class
+                      int index = 5; // Set the appropriate index
                       _pageController.animateToPage(
                         index,
                         duration: Duration(milliseconds: 500),
@@ -219,193 +225,89 @@ class _MyHomePageState extends State<MyHomePage2> {
           ProfileTab(),
           AboutTab(),
           ContactTab(),
-          // Add more pages as needed
+          FoodTab(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false, // Hide selected labels
-        showUnselectedLabels: true, // Hide unselected labels
-        //currentIndex: _selectedTabIndex,
-        currentIndex: _currentPage,
+        currentIndex: _currentIndex,
         onTap: (index) {
           _pageController.animateToPage(
             index,
             duration: Duration(milliseconds: 500),
             curve: Curves.easeInOut,
           );
-        }, //_onItemTapped,
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        selectedItemColor: Colors.white, // Selected item color
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Color.fromARGB(255, 174, 52, 52), // Background color
+        type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: Colors.red, // Set icon color to red
-            ),
+            icon: Icon(Icons.home),
             label: 'Home',
-            backgroundColor: Colors.yellow, // Set background color to yellow
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.favorite,
-              color: Colors.red, // Set icon color to red
-            ),
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.shopping_cart,
-              color: Colors.red, // Set icon color to red
-            ),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person,
-              color: Colors.red, // Set icon color to red
-            ),
+            icon: Icon(Icons.person),
             label: 'Profile',
-            backgroundColor: Colors.yellow, // Set background color to yellow
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.visibility_off), // Icon for the hidden item
-          //   label: 'Hidden',
-          //   backgroundColor: Colors.transparent,
-          // ),
         ],
       ),
+    );
+  }
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    Navigator.pop(context); // Close the drawer
+
+    _pageController.animateToPage(
+      index,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 }
 
 //============================TABS==================
-class CommonPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Common Page'),
-      ),
-      body: Center(
-        child: Text('Common Page Content'),
-      ),
-    );
-  }
-}
-
 class HomeTab extends StatelessWidget {
   double screenWidth = 0;
   double screenHeight = 0;
-  double MoodySize = 0;
-  double FoodySize = 0;
-  double WelcomeSize = 0;
-  
+  double moodySize = 0;
+  double foodySize = 0;
+  double welcomeSize = 0;
+
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
-    MoodySize = screenWidth * 0.08;
-    FoodySize = screenWidth * 0.05;
-    WelcomeSize = screenWidth * 0.025;
-    return Center(
-      child: Column(children: <Widget>[
-        //logo FOODY MOODY
-        Center(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(text: '\n', style: TextStyle(height: 2.0)),
-                TextSpan(
-                  text: '   M',
-                  style: TextStyle(
-                    fontSize: FoodySize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(219, 35, 38, 1.0),
-                  ),
-                ),
-                TextSpan(
-                  text: 'OO',
-                  style: TextStyle(
-                    fontSize: FoodySize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(244, 194, 13, 1.0),
-                  ),
-                ),
-                TextSpan(
-                  text: 'DY',
-                  style: TextStyle(
-                    fontSize: FoodySize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(219, 35, 38, 1.0),
-                  ),
-                ),
-                TextSpan(text: '\n', style: TextStyle(height: 2.0)),
-                TextSpan(
-                  text: 'F',
-                  style: TextStyle(
-                    fontSize: MoodySize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(244, 194, 13, 1.0),
-                  ),
-                ),
-                TextSpan(
-                  text: 'OO',
-                  style: TextStyle(
-                    fontSize: MoodySize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(219, 35, 38, 1.0),
-                  ),
-                ),
-                TextSpan(
-                  text: 'DY',
-                  style: TextStyle(
-                    fontSize: MoodySize,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(244, 194, 13, 1.0),
-                  ),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.start,
-          ),
-        ),
-        //deals
-        Center(
-          child: Container(
-            child: PostContainer(),
-          ),
-        ),
-        //Button for Upload
-        Center(
+    moodySize = screenWidth * 0.08;
+    foodySize = screenWidth * 0.05;
+    welcomeSize = screenWidth * 0.025;
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: () async {
-                  XFile? pickedFile = await pickImage();
-
-                  if (pickedFile != null) {
-                    // Do something with the picked image file
-                    print("Picked Image Path: ${pickedFile.path}");
-                  } else {
-                    // User canceled the image picking
-                    print("User canceled image picking");
-                  }
-                },
-                child: Text("Pick Image"),
-              ),
+            children: <Widget>[
+              FoodGallery(),
             ],
           ),
         ),
-        //Products
-        Center(
-
-        ),
-      ]),
+      ),
     );
   }
 }
@@ -657,84 +559,15 @@ class ContactTab extends StatelessWidget {
   }
 }
 
-class PostContainer extends StatefulWidget {
-  @override
-  _PostContainerState createState() => _PostContainerState();
-}
-
-class _PostContainerState extends State<PostContainer> {
-  final List<String> postImages = [
-    'images/deal1.jpg',
-    'images/deal2.jpg',
-    'images/deal3.jpg',
-    // Add more image paths as needed
-  ];
-
-  late PageController _pageController;
-  int _currentPage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(viewportFraction: 0.8);
-    startSlider();
-  }
-
-  void startSlider() {
-    Timer.periodic(Duration(seconds: 2), (timer) {
-      if (_currentPage < postImages.length * 100 - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
-
-      if (_pageController.hasClients) {
-        _pageController.animateToPage(
-          _currentPage,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
+class FoodTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Container(
-            height: 250.0, // Adjust the height as needed
-            child: PageView.builder(
-              itemCount: postImages.length *
-                  100, // A large number for continuous scrolling
-              controller: _pageController,
-              itemBuilder: (context, index) {
-                final postIndex = index % postImages.length;
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.0),
-                      image: DecorationImage(
-                        image: AssetImage(postImages[postIndex]),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          )),
+    return Center(
+      child: Text('Food Content'),
     );
   }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 }
+
 
 class EditableProfileField extends StatelessWidget {
   final String label;
@@ -794,6 +627,138 @@ class EditableProfileField extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class FoodGallery extends StatelessWidget {
+  final PageController _pageController = PageController();
+  final List<String> postImages = [
+    'Products/BBQChikenPizza.jpg',
+    'Products/CheeseBurger.jpg',
+    'Products/ChickenPizza.jpg',
+    'Products/ChikenLegPiece.jpg',
+    'Products/FajitaPizza.jpg',
+    'Products/FriedFish.jpg',
+    'Products/Pasta.jpg',
+    'Products/PetttyBurger.jpg',
+    'Products/ZingerBurger.jpg',
+    'Products/Fries.jpg',
+    // Add more image paths as needed
+  ];
+
+  final List<String> postNames = [
+    'BBQ Chicken Pizza',
+    'Cheese Burger',
+    'Chicken Pizza',
+    'Chicken Leg Piece',
+    'Fajita Pizza',
+    'Fried Fish',
+    'Pasta',
+    'Patty Burger',
+    'Chicken Ginger Burger',
+    'Fries',
+  ];
+
+  final List<String> postPrices = [
+    "800", // BBQ Chicken Pizza
+    "350", // Cheese Burger
+    "600", // Chicken Pizza
+    "180", // Chicken Leg Piece
+    "850", // Fajita Pizza
+    "400", // Fried Fish
+    "300", // Pasta
+    "400", // Patty Burger
+    "500", // Zinger Burger
+    "100", // Fries
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context)
+          .size
+          .height, // Set a fixed height or adjust as needed
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8.0,
+          mainAxisSpacing: 8.0,
+        ),
+        itemCount: postImages.length,
+        itemBuilder: (context, index) {
+          return _buildFoodItemCard(
+            postImages[index],
+            postNames[index],
+            double.parse(postPrices[index]),
+            index,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFoodItemCard(
+      String imagePath, String foodName, double recommendedPrice, int index) {
+    return GestureDetector(
+      onTap: () {
+        // Handle click event here, you can print or perform any action
+        print('Clicked on $foodName, Price: $recommendedPrice');
+        _navigateToFoodTab(index); // Navigate to FoodTab
+      },
+      child: Card(
+        elevation: 2.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 120.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12.0),
+                  topRight: Radius.circular(12.0),
+                ),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    foodName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4.0),
+                  Text(
+                    'RS ${recommendedPrice.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  void _navigateToFoodTab(int index) {
+    _pageController.animateToPage(
+      6, // Index of FoodTab
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 }

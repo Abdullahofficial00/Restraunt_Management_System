@@ -1,9 +1,12 @@
 //import 'package:firebase_core/firebase_core.dart';
+import 'dart:html';
+
 import 'package:flutter/material.dart';
-import 'package:food/login.dart';
-import 'package:food/signup.dart';
-import 'package:food/test.dart';
-import 'package:food/home.dart' as myHome;
+import 'package:foody/login.dart';
+import 'package:foody/signup.dart';
+import 'package:foody/test.dart';
+import 'package:foody/home.dart';
+import 'package:foody/Image.dart' as Image;
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   //await Firebase.initializeApp();
@@ -16,13 +19,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Main',
       routes: {
-        '/login': (context) => LoginPage(),
+        '/login': (context) => Login(),
         '/sign_up': (context) => SignUp(),
-        '/home': (context) => myHome.MyHomePage2(),
-        '/test': (context) => MyHomePage1(),
+        '/home': (context) => Home(),
+        //'/test': (context) => Test(),
+        '/image': (context) => Image.FoodGallery(),
       },
-      //home: myHome.MyHomePage2(),
-      home: SignUp(),
+      home: Login(),
+      //home: Image.FoodGallery(),
       debugShowCheckedModeBanner: false,
     );
   }

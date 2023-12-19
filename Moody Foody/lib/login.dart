@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_social_button/flutter_social_button.dart';
@@ -7,7 +5,7 @@ import 'dart:convert';
 import 'signup.dart';
 import 'home.dart';
 import 'package:flutter/gestures.dart';
-import 'forgotpass.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(Login());
 
@@ -18,9 +16,8 @@ class Login extends StatelessWidget {
       title: "Foody Moody",
       debugShowCheckedModeBanner: false,
       routes: {
-        '/home': (context) => MyHomePage2(),
+        '/home': (context) => Home(),
         '/signup': (context) => SignUp(),
-        '/forgotpass': (context) => ForgotPasswordScreen(),
       },
       home: LoginPage(),
     );
@@ -102,6 +99,21 @@ class _LoginPageState extends State<LoginPage> {
       });
       print("Error: $e");
     }
+  }
+
+// Save user information to SharedPreferences
+  Future<void> saveUserInfo(String userId, String username) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('userId', userId);
+    prefs.setString('username', username);
+  }
+
+  // Retrieve user information from SharedPreferences
+  Future<Map<String, String>> getUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('userId') ?? '';
+    String username = prefs.getString('username') ?? '';
+    return {'userId': userId, 'username': username};
   }
 
   void deleteUser(String userId) async {
@@ -210,6 +222,16 @@ class _LoginPageState extends State<LoginPage> {
 
       if (response.statusCode == 201) {
         // Login successful
+        Map<String, String> userInfo = {
+          'userId': 'yourUserId', // Replace with the actual user ID
+          'username': emailController.text, // Assuming email is the username
+        };
+
+        await saveUserInfo(userInfo['userId']!, userInfo['username']!);
+
+        // Navigate to the home page
+        Navigator.pushNamed(context, '/home');
+
         return true;
       } else if (response.statusCode == 401) {
         // Invalid user or password
@@ -755,13 +777,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void authenticateUser() {
-    // Replace the following line with your actual authentication logic
     bool isAuthenticated = true;
 
     if (isAuthenticated) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage2()),
+        MaterialPageRoute(builder: (context) => Home()),
       );
       // } else {
       //   // Show error message or handle authentication failure
