@@ -3,6 +3,7 @@ const bodyparser=require('body-parser');
 const userRouter=require('./routes/user.routes');
 const emailRouter=require('./routes/email.routes');
 const foodRouter=require('./routes/food.routes');
+const imageRouter=require('./routes/image.routes');
 const cors = require ('cors');
 const mongoose = require('mongoose');
 
@@ -22,6 +23,7 @@ app.use(cors());
 app.use('/api', userRouter);
 app.use('/api', emailRouter);
 app.use('/api', foodRouter);
+app.use('/api', imageRouter);
 
 app.get('/',(req,res) => {
     res.send('Hello World!');

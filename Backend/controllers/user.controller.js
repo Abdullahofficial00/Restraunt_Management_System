@@ -5,7 +5,6 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken'); // Import the jwt library
 
 
-
 // async function forgot(req, res) {
 //   try {
 //     const { email } = req.body;
@@ -42,6 +41,17 @@ const jwt = require('jsonwebtoken'); // Import the jwt library
 //   }
 // }
 
+function validateToken(token) {
+  // Check if the token is defined before trying to split it
+  if (token) {
+      const parts = token.split(' ');
+      // Rest of the code...
+  } else {
+      // Handle the case where the token is undefined
+      console.error('Token is undefined');
+      // Rest of the error handling...
+  }
+}
 function GenerateToken(user) {
   const payload = {
     role: user.role,
@@ -106,26 +116,56 @@ async function getAllUser(req, res) {
     }
   }
 
+
   async function updateUser(req, res) {
-    try {
-      const userId = req.params.id;
-      const updatedData = req.body; 
+      try {
+          const userId = req.params.id;
+          const updatedData = req.body;
   
-      const updatedUser = await User.findOneAndUpdate({ _id: userId }, updatedData, { new: true });
+          // Find the user before the update
+          const userBeforeUpdate = await User.findById(userId);
   
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+          // Save the old and updated data in the userAudit table
+          const userAuditData = {
+              username1: userBeforeUpdate.username,
+              username2: updatedData.username || userBeforeUpdate.username,
+              email1: userBeforeUpdate.email,
+              email2: updatedData.email || userBeforeUpdate.email,
+              password1: userBeforeUpdate.password,
+              password2: updatedData.password || userBeforeUpdate.password,
+              role: userBeforeUpdate.role,
+              role2: updatedData.role || userBeforeUpdate.role,
+              address1: userBeforeUpdate.address,
+              address2: updatedData.address || userBeforeUpdate.address,
+              phone1: userBeforeUpdate.phone,
+              phone2: updatedData.phone || userBeforeUpdate.phone,
+              Imageurl1: userBeforeUpdate.Imageurl,
+              Imageurl2: updatedData.Imageurl || userBeforeUpdate.Imageurl,
+          };
+  
+          // Create an instance of the UserAudit model and save it
+          const userAuditEntry = new UserAudit(userAuditData);
+          await userAuditEntry.save();
+  
+          // Update the user
+          const updatedUser = await User.findOneAndUpdate({ _id: userId }, updatedData, { new: true });
+  
+          if (!updatedUser) {
+              return res.status(404).json({ message: 'User not found' });
+          }
+  
+          if (!updatedUser._id) {
+              return res.status(200).json({ message: 'No updates were made' });
+          }
+  
+          console.log('User updated successfully');
+          res.status(200).json({ message: 'User updated successfully' });
+      } catch (error) {
+          res.status(500).json({ error: error });
       }
-  
-      if (!updatedUser._id) {
-        return res.status(200).json({ message: 'No updates were made' });
-      }
-      console.log('User updated successfully');
-      res.status(200).json({ message: 'User updated successfully' });
-    } catch (error) {
-      res.status(500).json({ error: error });
-    }
   }
+  
+
 
   async function deleteUser(req, res) {
     try {

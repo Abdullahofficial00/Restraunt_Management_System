@@ -47,9 +47,13 @@ const userAudit = mongoose.Schema({
     password1: { type: String },
     password2: { type: String },
     role: { type: String },
+    role2: { type: String },
     address: { type: String },
+    address2: { type: String },
     phone: { type: Number },
+    phone2: { type: Number },
     Imageurl: { type: String },
+    Imageurl2: { type: String },
 }, { timestamps: true });
 
 

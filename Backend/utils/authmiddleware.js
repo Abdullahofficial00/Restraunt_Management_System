@@ -29,6 +29,7 @@ function requireRoles(roles) {
     }    
     };   
     }
+    
 
 module.exports = {
     validateToken,
