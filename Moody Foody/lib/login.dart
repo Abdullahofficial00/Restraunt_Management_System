@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> getData() async {
     try {
       final response = await http.get(
-        Uri.parse("http://localhost:3000/api/user"),
+        Uri.parse("http://localhost:3000/api/login"),
         headers: {
           "Accept": "application/json",
         },
